@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="kk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Тойға шақырту</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'wedding.css' %}" />
+  </head>
+  <body>
+    <main class="invitation">
+      <section class="intro">
+        <p class="eyebrow script">Үйлену той</p>
+        <h1>НҰРСҰЛТАН<br /><span class="script ampersand">және</span><br />АЙДАНА</h1>
+        <img class="main-photo" src="{% static 'images/couple.png' %}" alt="Нұрсұлтан және Айдана" />
+        <p class="invite-line script">Күнді белгілеп қойыңыз!</p>
+        <p class="date-line">18.10.2026 <span>18:00</span></p>
+      </section>
+
+      <section class="countdown-section">
+        <div class="countdown" data-target="{{ event_date|date:'c' }}" aria-label="Тойға дейінгі уақыт">
+          <div><b id="days">00</b><small>күн</small></div>
+          <div><b id="hours">00</b><small>сағат</small></div>
+          <div><b id="minutes">00</b><small>минут</small></div>
+          <div><b id="seconds">00</b><small>секунд</small></div>
+        </div>
+      </section>
+
+      <section class="place">
+        <h2>САЛТАНАТ ОРНЫ</h2>
+        <img class="venue-photo" src="{% static 'images/venue.png' %}" alt="Event Hall салтанат залы" />
+        <p class="place-title script">Мекен-жай</p>
+        <p class="place-copy">Той орны</p>
+        <address>Қаскелең қаласы<br /><em>Event Hall</em></address>
+      </section>
+
+      <section class="message">
+        <p class="script">Қуанышымызға ортақ болыңыздар!</p>
+        <span>Біз үшін ең қымбат күннің куәгері<br />болып, тойымыздың шаттығын<br />бөлісіңіздер!</span>
+      </section>
+
+      <section class="wishes" id="wishes">
+        <p class="script">Тілектер</p>
+        <span>Жас жұбайларға тілек қалдырыңыз.</span>
+        {% if request.GET.sent == 'wish' %}
+          <div class="form-success" role="status">Тілегіңіз қабылданды. Рақмет!</div>
+        {% endif %}
+        <button class="wish-open" type="button" data-wish-open>✉&nbsp; Тілек қалдыру</button>
+      </section>
+
+      <img class="walk-photo" src="{% static 'images/walk.png' %}" alt="Болашақ отбасы" />
+
+      <section class="rsvp" id="rsvp">
+        <p class="script">Қонақ сауалнамасы</p>
+        <span>Тойға келуіңізді растауыңызды<br />сұраймыз!</span>
+        <form method="post" class="rsvp-form">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="form-field">
+            {{ form.full_name.label_tag }}
+            {{ form.full_name }}
+            {{ form.full_name.errors }}
+          </div>
+          <fieldset>
+            <legend>Келесіз бе?</legend>
+            {% for choice in form.attendance %}
+              <label class="radio-choice">{{ choice.tag }} <span>{{ choice.choice_label }}</span></label>
+            {% endfor %}
+            {{ form.attendance.errors }}
+          </fieldset>
+          <button type="submit">Жіберу</button>
+        </form>
+      </section>
+
+      <footer>
+        <p class="script">Сіздерді асыға<br />күтеміз!</p>
+        <span>НҰРСҰЛТАН · АЙДАНА</span>
+      </footer>
+    </main>
+
+    <div class="wish-modal" data-wish-modal data-open="{% if wish_form.errors %}true{% endif %}" hidden>
+      <div class="modal-backdrop" data-wish-close></div>
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="wish-modal-title">
+        <button class="modal-close" type="button" aria-label="Жабу" data-wish-close>×</button>
+        <h2 id="wish-modal-title">Тілек қалдыру</h2>
+        <p>Жас жұбайларға жылы сөздер жазыңыз.</p>
+        <form method="post" class="wish-form">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="wish" />
+          <div>
+            {{ wish_form.name.label_tag }}
+            {{ wish_form.name }}
+            {{ wish_form.name.errors }}
+          </div>
+          <div>
+            {{ wish_form.message.label_tag }}
+            {{ wish_form.message }}
+            {{ wish_form.message.errors }}
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="cancel" data-wish-close>Жабу</button>
+            <button type="submit">Жіберу</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <audio id="wedding-music" preload="none" loop>
+      <source src="{% static 'music/toi_mus.mp3' %}" type="audio/mpeg" />
+    </audio>
+    <button class="music-toggle" type="button" aria-label="Музыканы қосу" aria-pressed="false" data-music-toggle>♫</button>
+    <script src="{% static 'countdown.js' %}"></script>
+    <script src="{% static 'invitation.js' %}"></script>
+  </body>
+</html>
