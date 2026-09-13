@@ -27,24 +27,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const music = document.querySelector('#wedding-music');
   const musicButton = document.querySelector('[data-music-toggle]');
+  const setMusicButtonState = (isPlaying) => {
+    if (!musicButton) return;
+    musicButton.classList.toggle('is-playing', isPlaying);
+    musicButton.textContent = isPlaying ? '❚❚' : '♫';
+    musicButton.setAttribute('aria-label', isPlaying ? 'Музыканы өшіру' : 'Музыканы қосу');
+    musicButton.setAttribute('aria-pressed', String(isPlaying));
+  };
+  const startMusic = async () => {
+    if (!music) return;
+    try {
+      await music.play();
+      setMusicButtonState(true);
+    } catch (_) {
+      setMusicButtonState(false);
+    }
+  };
+
+  startMusic();
   musicButton?.addEventListener('click', async () => {
     if (!music) return;
     if (music.paused) {
-      try {
-        await music.play();
-        musicButton.classList.add('is-playing');
-        musicButton.textContent = '❚❚';
-        musicButton.setAttribute('aria-label', 'Музыканы өшіру');
-        musicButton.setAttribute('aria-pressed', 'true');
-      } catch (_) {
-        musicButton.setAttribute('aria-label', 'Музыканы ойнату мүмкін болмады');
-      }
+      await startMusic();
     } else {
       music.pause();
-      musicButton.classList.remove('is-playing');
-      musicButton.textContent = '♫';
-      musicButton.setAttribute('aria-label', 'Музыканы қосу');
-      musicButton.setAttribute('aria-pressed', 'false');
+      setMusicButtonState(false);
     }
   });
 });
