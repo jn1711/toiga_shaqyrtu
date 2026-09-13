@@ -45,6 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   startMusic();
+  // Browsers block unmuted autoplay. Start music on the visitor's first
+  // natural interaction anywhere on the page if the initial attempt was blocked.
+  const startOnFirstInteraction = () => {
+    if (music?.paused) startMusic();
+  };
+  ['pointerdown', 'touchstart', 'keydown', 'scroll'].forEach((eventName) => {
+    window.addEventListener(eventName, startOnFirstInteraction, { once: true, passive: eventName !== 'keydown' });
+  });
   musicButton?.addEventListener('click', async () => {
     if (!music) return;
     if (music.paused) {
